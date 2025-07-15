@@ -1,46 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CafeteriaOrderingApp.Models;
+using CafeteriaOrderingApp.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using CafeteriaOrderingApp.Database;
-using CafeteriaOrderingApp.Models;
 
 namespace CafeteriaOrderingApp.Controllers
 {
     public class EmployeesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IEmployeeService _employeeService;
 
-        public EmployeesController(ApplicationDbContext context)
+        public EmployeesController(IEmployeeService employeeService)
         {
-            _context = context;
+            _employeeService = employeeService;
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Employees.ToListAsync());
-        }
-
-        // GET: Employees/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            return View(employee);
+            var employees = _employeeService.GetAllEmployees();
+            return View(employees);
         }
 
         // GET: Employees/Create
@@ -49,31 +26,42 @@ namespace CafeteriaOrderingApp.Controllers
             return View();
         }
 
+        //// GET: Employees/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            if (id != null)
+            {
+                var employee = _employeeService.GetEmployeeById(id);
+                if (employee == null)
+                {
+                    return NotFound();
+                }
+
+                return View(employee);
+            }
+
+            return NotFound();
+        }
+
         // POST: Employees/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,EmployeeNumber,Balance,LastDepositMonth")] Employee employee)
+        public IActionResult Create(Employee employee)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
+                _employeeService.AddEmployee(employee);
                 return RedirectToAction(nameof(Index));
             }
             return View(employee);
         }
 
         // GET: Employees/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = _employeeService.GetEmployeeById(id);
             if (employee == null)
             {
                 return NotFound();
@@ -81,36 +69,12 @@ namespace CafeteriaOrderingApp.Controllers
             return View(employee);
         }
 
-        // POST: Employees/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,EmployeeNumber,Balance,LastDepositMonth")] Employee employee)
+        public IActionResult Edit(Employee employee)
         {
-            if (id != employee.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EmployeeExists(employee.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _employeeService.UpdateEmployee(employee);
                 return RedirectToAction(nameof(Index));
             }
             return View(employee);
@@ -124,8 +88,7 @@ namespace CafeteriaOrderingApp.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var employee = _employeeService.GetEmployeeById(id.Value);
             if (employee == null)
             {
                 return NotFound();
@@ -137,21 +100,22 @@ namespace CafeteriaOrderingApp.Controllers
         // POST: Employees/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult Delete(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee != null)
-            {
-                _context.Employees.Remove(employee);
-            }
-
-            await _context.SaveChangesAsync();
+            _employeeService.DeleteEmployee(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool EmployeeExists(int id)
+        public IActionResult Deposit()
         {
-            return _context.Employees.Any(e => e.Id == id);
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Deposit(string employeeNumber, decimal amount)
+        {
+            _employeeService.Deposit(employeeNumber, amount);
+            return RedirectToAction(nameof(Index));
         }
     }
 }
