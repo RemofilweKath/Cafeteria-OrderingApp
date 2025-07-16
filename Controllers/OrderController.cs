@@ -8,10 +8,10 @@ namespace CafeteriaOrderingApp.Controllers
 {
     public class OrdersController : Controller
     {
-        private readonly OrderService _orderService;
+        private readonly IOrderService _orderService;
         private readonly ApplicationDbContext _context;
 
-        public OrdersController(OrderService orderService, ApplicationDbContext context)
+        public OrdersController(IOrderService orderService, ApplicationDbContext context)
         {
             _orderService = orderService;
             _context = context;

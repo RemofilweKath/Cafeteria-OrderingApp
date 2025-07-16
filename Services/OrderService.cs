@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CafeteriaOrderingApp.Services
 {
-    public class OrderService
+    public class OrderService : IOrderService
     {
         private readonly ApplicationDbContext _context;
 

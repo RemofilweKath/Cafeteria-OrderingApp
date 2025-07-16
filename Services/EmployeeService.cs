@@ -79,7 +79,9 @@ namespace CafeteriaOrderingApp.Services
             // Update balance and monthly deposit tracking
             employee.Balance += amount;
             employee.MonthlyDepositBalance += amount;
-            employee.LastDepositMonth = DateTime.Now;
+
+            var currentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            employee.LastDepositMonth = currentMonth;
 
             // Bonus Logic: Apply R500 bonus for every R250 increment crossed in current month
             long bonusThresholdBefore = (long)(monthlyDepositBefore / 250);

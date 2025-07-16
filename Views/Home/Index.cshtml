@@ -3,6 +3,43 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to the Cafeteria Ordering System</h1>
+    <p>A convenient way to manage cafeteria deposits, browse menus, and place orders.</p>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <h4>Employee Management</h4>
+            <ul class="list-unstyled">
+                <li><a asp-controller="Employees" asp-action="Index">View All Employees</a></li>
+                <li><a asp-controller="Employees" asp-action="Create">Add New Employee</a></li>
+                <li><a asp-controller="Employees" asp-action="Deposit">Make a Deposit</a></li>
+                <li><a asp-controller="Employees" asp-action="Details">View Account Details</a></li>
+            </ul>
+        </div>
+
+        <div class="col-md-4">
+            <h4>Restaurants & Menus</h4>
+            <ul class="list-unstyled">
+                <li><a asp-controller="Restaurants" asp-action="Index">Browse Restaurants</a></li>
+                <li><a asp-controller="Restaurants" asp-action="Menu" asp-route-id="1">View Restaurant Menu</a></li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li><a asp-controller="Restaurants" asp-action="Create">Add New Restaurant</a></li>
+                }
+            </ul>
+        </div>
+
+        <div class="col-md-4">
+            <h4>Orders & Delivery</h4>
+            <ul class="list-unstyled">
+                <li><a asp-controller="Orders" asp-action="History">My Order History</a></li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li><a asp-controller="Orders" asp-action="Manage">Manage All Orders</a></li>
+                }
+            </ul>
+        </div>
+    </div>
 </div>

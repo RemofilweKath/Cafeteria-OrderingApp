@@ -23,6 +23,10 @@ namespace CafeteriaOrderingApp.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
+            var employee = new Employee
+            {
+                LastDepositMonth = DateTime.Now // Sets to current date, but model setter will normalize to first of the month
+            };
             return View();
         }
 
@@ -47,7 +51,7 @@ namespace CafeteriaOrderingApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public IActionResult Create(Employee employee)
         {
             if (ModelState.IsValid)
