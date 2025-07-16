@@ -6,7 +6,7 @@ namespace CafeteriaOrderingApp.Services
     {
         void AddRestaurant(Restaurant restaurant);
         IEnumerable<Restaurant> GetAllRestaurants();
-        Restaurant GetRestaurantById(int id);
+        Task<Restaurant> GetRestaurantById(int id);
         void UpdateRestaurant(Restaurant restaurant);
         void DeleteRestaurant(int id);
         void AddMenuItem(MenuItem menuItem);

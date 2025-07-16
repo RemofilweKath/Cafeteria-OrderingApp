@@ -1,0 +1,38 @@
+﻿@model CafeteriaOrderingApp.Models.Restaurant
+
+@{
+    ViewData["Title"] = $"{Model.Name} Menu";
+}
+
+<h2>@Model.Name Menu</h2>
+<p><strong>Location:</strong> @Model.LocationDescription</p>
+
+<form asp-controller="Orders" asp-action="AddToCart" method="post">
+    <input type="hidden" name="restaurantId" value="@Model.Id" />
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.MenuItems)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Description</td>
+                    <td>R @item.Price.ToString("0.00")</td>
+                    <td>
+                        <input type="number" name="items[@item.Id].Quantity" min="0" value="0" class="form-control w-50" />
+                        <input type="hidden" name="items[@item.Id].MenuItemId" value="@item.Id" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Add to Order</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to Restaurants</a>
+</form>

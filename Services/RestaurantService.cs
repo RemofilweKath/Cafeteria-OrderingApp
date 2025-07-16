@@ -1,5 +1,6 @@
 ﻿using CafeteriaOrderingApp.Database;
 using CafeteriaOrderingApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CafeteriaOrderingApp.Services
 {
@@ -23,9 +24,9 @@ namespace CafeteriaOrderingApp.Services
             return _context.Restaurants.ToList();
         }
 
-        public Restaurant GetRestaurantById(int id)
+        public async Task<Restaurant> GetRestaurantById(int id)
         {
-            return _context.Restaurants.Find(id);
+            return await _context.Restaurants.Include(r => r.MenuItems).FirstOrDefaultAsync(r => r.Id == id); ;
         }
 
         public void UpdateRestaurant(Restaurant restaurant)

@@ -1,0 +1,52 @@
+﻿@model IEnumerable<CafeteriaOrderingApp.Models.Order>
+
+@{
+    ViewData["Title"] = "Manage Orders";
+}
+
+<h2>Manage Orders</h2>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Employee</th>
+            <th>Order Date</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.Employee.Name</td>
+                <td>@order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>R @order.TotalAmount.ToString("0.00")</td>
+                <td>@order.Status</td>
+                <td>
+                    <form asp-action="UpdateStatus" method="post" class="d-inline">
+                        <input type="hidden" name="orderId" value="@order.Id" />
+                        <select name="status" class="form-control-sm">
+                            <option value="Cancelled" selected="@(order.Status == Order.OrderStatus.Cancelled)">Cancelled</option>
+                            <option value="Pending" selected="@(order.Status == Order.OrderStatus.Pending)">Pending</option>
+                            <option value="Preparing" selected="@(order.Status == Order.OrderStatus.Preparing)">Preparing</option>
+                            <option value="Delivering" selected="@(order.Status == Order.OrderStatus.Delivering)">Delivering</option>
+                            <option value="Delivered" selected="@(order.Status == Order.OrderStatus.Delivered)">Delivered</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>t not have 

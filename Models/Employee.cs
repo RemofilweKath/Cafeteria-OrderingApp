@@ -14,8 +14,10 @@ namespace CafeteriaOrderingApp.Models
         public string EmployeeNumber { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal Balance { get; set; } = 0.0m;
+        public decimal Balance { get; set; }
 
         public DateTime LastDepositMonth { get; set; } = DateTime.MinValue;
+
+        public decimal MonthlyDepositBalance { get; set; } = 0.0m;
     }
 }

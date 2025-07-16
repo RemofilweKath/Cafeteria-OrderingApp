@@ -1,16 +1,20 @@
-﻿using CafeteriaOrderingApp.Models;
+﻿using CafeteriaOrderingApp.Database;
+using CafeteriaOrderingApp.Models;
 using CafeteriaOrderingApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CafeteriaOrderingApp.Controllers
 {
     public class RestaurantsController : Controller
     {
-        private readonly IRestaurantService _restaurantService;
+        private readonly RestaurantService _restaurantService;
+        private readonly ApplicationDbContext _context;
 
-        public RestaurantsController(IRestaurantService restaurantService)
+        public RestaurantsController(RestaurantService restaurantService, ApplicationDbContext context)
         {
             _restaurantService = restaurantService;
+            _context = context;
         }
 
         // View all restaurants
@@ -96,6 +100,43 @@ namespace CafeteriaOrderingApp.Controllers
         {
             _restaurantService.DeleteRestaurant(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        // Display detailed menu for a specific restaurant
+        public async Task<IActionResult> Menu(int id)
+        {
+            var restaurant = await _context.Restaurants
+                .Include(r => r.MenuItems)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (restaurant == null)
+                return NotFound();
+
+            return View(restaurant);
+        }
+
+        // Add a new menu item
+        public void AddMenuItem(MenuItem menuItem)
+        {
+            _restaurantService.AddMenuItem(menuItem);
+        }
+
+        // View all menu items
+        public IEnumerable<MenuItem> ViewMenu(int restaurantId)
+        {
+            return _restaurantService.GetMenuItemsByRestaurant(restaurantId);
+        }
+
+        // Edit a menu item
+        public void EditMenuItem(MenuItem menuItem)
+        {
+            _restaurantService.UpdateMenuItem(menuItem);
+        }
+
+        // Delete a menu item
+        public void DeleteMenuItem(int itemId)
+        {
+            _restaurantService.DeleteMenuItem(itemId);
         }
     }
 }

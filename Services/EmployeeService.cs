@@ -60,21 +60,39 @@ namespace CafeteriaOrderingApp.Services
         public decimal Deposit(string employeeNumber, decimal amount)
         {
             var employee = _context.Employees.FirstOrDefault(e => e.EmployeeNumber == employeeNumber);
-            if (employee != null && amount > 0)
+
+            if (employee == null || amount <= 0)
             {
-                employee.Balance += amount;
-
-                // Bonus Logic
-                if ((employee.Balance - amount) % 250 == 0)
-                {
-                    employee.Balance += 500; // Apply bonus
-                }
-
-                employee.LastDepositMonth = DateTime.Now;
-                _context.SaveChanges();
-                return employee!.Balance;
+                throw new ArgumentException("Invalid employee or deposit amount.");
             }
-            return 0.0m; // Return 0
+
+            // Reset Balance every new month
+            if (employee.LastDepositMonth.Month != DateTime.Now.Month || employee.LastDepositMonth.Year != DateTime.Now.Year)
+            {
+                employee.MonthlyDepositBalance = 0;
+            }
+
+            // Store the balance before the deposit
+            decimal monthlyDepositBefore = employee.MonthlyDepositBalance;
+            decimal monthlyDepositAfter = monthlyDepositBefore + amount;
+
+            // Update balance and monthly deposit tracking
+            employee.Balance += amount;
+            employee.MonthlyDepositBalance += amount;
+            employee.LastDepositMonth = DateTime.Now;
+
+            // Bonus Logic: Apply R500 bonus for every R250 increment crossed in current month
+            long bonusThresholdBefore = (long)(monthlyDepositBefore / 250);
+            long bonusThresholdAfter = (long)(monthlyDepositAfter / 250);
+
+            if (bonusThresholdAfter > bonusThresholdBefore)
+            {
+                // Calculate how many R250 thresholds were crossed with this deposit
+                decimal bonusAmount = (bonusThresholdAfter - bonusThresholdBefore) * 500;
+                employee.Balance += bonusAmount;
+            }
+
+            return employee.Balance;
         }
     }
 }

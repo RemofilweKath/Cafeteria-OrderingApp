@@ -1,0 +1,46 @@
+﻿@model CafeteriaOrderingApp.Models.OrderConfirmation
+
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+
+<h2>Order Confirmation</h2>
+<div class="alert alert-success" role="alert">
+    Thank you for your order! Your order has been placed successfully.
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Order # @Model.OrderId</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Order Date:</strong> @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+        <p><strong>Status:</strong> @Model.Status</p>
+        <h6>Items Ordered:</h6>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.ItemName</td>
+                        <td>@item.Quantity</td>
+                        <td>R @item.UnitPrice.ToString("0.00")</td>
+                        <td>R @item.TotalPrice.ToString("0.00")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <p class="font-weight-bold">Total Amount: R @Model.TotalAmount.ToString("0.00")</p>
+    </div>
+</div>
+
+<a asp-controller="Restaurants" asp-action="Index" class="btn btn-primary mt-3">Continue Browsing</a>
+<a asp-controller="Orders" asp-action="History" class="btn btn-secondary mt-3">View Order History</a>

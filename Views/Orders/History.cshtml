@@ -1,0 +1,106 @@
+﻿@model IEnumerable<CafeteriaOrderingApp.Models.Order>
+
+@{
+    ViewData["Title"] = "Order History";
+}
+
+<h2>Order History</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info" role="alert">
+        You have no orders yet.
+    </div>
+    <a asp-controller="Restaurants" asp-action="Index" class="btn btn-primary">Browse Restaurants</a>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Order Date</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>#@order.Id</td>
+                        <td>@order.OrderDate.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>R @order.TotalAmount.ToString("0.00")</td>
+                        <td>
+                            <span class="badge @(order.Status == Order.OrderStatus.Delivered ? "badge-success" : order.Status == Order.OrderStatus.Delivering ? "badge-primary" : order.Status == Order.OrderStatus.Preparing ? "badge-warning" : "badge-secondary")">
+                                @order.Status
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="showOrderDetails(@order.Id)" data-toggle="modal" data-target="#orderDetailsModal_@order.Id">
+                                View Details
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modals for Order Details -->
+    @foreach (var order in Model)
+    {
+        <div class="modal fade" id="orderDetailsModal_@order.Id" tabindex="-1" role="dialog" aria-labelledby="orderDetailsModalLabel_@order.Id" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="orderDetailsModalLabel_@order.Id">Order Details - #@order.Id</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Order Date:</strong> @order.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+                        <p><strong>Status:</strong> @order.Status</p>
+                        <p><strong>Total Amount:</strong> R @order.TotalAmount.ToString("0.00")</p>
+                        <h6>Items Ordered:</h6>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in order.OrderItems)
+                                {
+                                    <tr>
+                                        <td>@item.MenuItem.Name</td>
+                                        <td>@item.Quantity</td>
+                                        <td>R @item.UnitPriceAtTimeOfOrder.ToString("0.00")</td>
+                                        <td>R @(item.Quantity* item.UnitPriceAtTimeOfOrder).ToString("0.00")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@section Scripts {
+    <script>
+        function showOrderDetails(orderId) {
+            $('#orderDetailsModal_' + orderId).modal('show');
+        }
+    </script>
+}
